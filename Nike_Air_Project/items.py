@@ -15,6 +15,6 @@ class ZapatillaItem(scrapy.Item):
     color = scrapy.Field()
     precio = scrapy.Field()
     imagenes = scrapy.Field()
-    tipo = scrapy.Field()
+    descripcion = scrapy.Field()
     url_raiz = scrapy.Field()
     url_calzado = scrapy.Field()

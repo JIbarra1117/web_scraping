@@ -64,7 +64,7 @@ class ZapatillasSpider(scrapy.Spider):
         item['marca']  = 'Nike'
         item['precio'] = response.xpath('//div[@data-test="product-price"]//text()').getall()
         item['color']  = response.xpath(div_descripcion+'//li[@class="description-preview__color-description ncss-li"]//text()').getall()
-        item['tipo'] = response.xpath('//h2[@class="headline-5 pb1-sm d-sm-ib"]/text()').getall()
+        item['descripcion'] = response.xpath('//h2[@class="headline-5 pb1-sm d-sm-ib"]/text()').getall()
         item['url_raiz'] = self.link_raiz
         item['url_calzado'] = response.url
         text_tallas = response.xpath("//script[@id='__NEXT_DATA__']/text()").get()
