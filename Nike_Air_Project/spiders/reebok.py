@@ -3,7 +3,6 @@ import scrapy
 from selenium import webdriver
 # from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains 
 from selenium.common.exceptions import ElementClickInterceptedException,NoSuchElementException
@@ -20,7 +19,9 @@ class ZapatillasSpider(scrapy.Spider):
     # start_urls = ["https://x"]
     def start_requests(self):
         chrome_options = webdriver.ChromeOptions()
-        prefs ={"profile.default_content_setting_values.notifications":2}
+        prefs ={    "profile.default_content_setting_values.notifications":2,
+                    "translate_whitelists": {"en":"es"},
+                    "translate":{"enabled":"true"}}
         chrome_options.add_experimental_option("prefs",prefs )
         # Establecer a español
         chrome_options.add_argument("--lang=es")  
