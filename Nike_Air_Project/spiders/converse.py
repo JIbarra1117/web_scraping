@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 import time
 from Nike_Air_Project.items import ZapatillaItem
 # import os
@@ -123,27 +124,44 @@ class ZapatillasSpider(scrapy.Spider):
         # Calcular la cantidad de pasos necesarios
         # num_steps = int(total_scroll_height / (total_scroll_height * scroll_fraction))
         # Elemento del footer
-        footer_xpath = "//footer[@class='footer ']/div[@class='footer__container text-color--neutral-4']"  
+        # footer_xpath = "//footer[@class='footer ']/div[@class='footer__container text-color--neutral-4']/div"  
+        footer_xpath = "//div[@class='row grid-no-gutters plp__seo-popular-search']/div"  
         
         # Obtener el elemento del footer
         footer_element = driver.find_element(By.XPATH, footer_xpath)
 
-        # Función para verificar si el elemento es visible
-        def is_element_visible(element):
+        # Función para verificar si el elemento está completamente dentro de la vista
+        def is_element_fully_visible(element):
             try:
-                return element.is_displayed()
-            except Exception:
+                # Esperar hasta que el elemento sea visible
+                WebDriverWait(driver, 10).until(
+                    EC.visibility_of(element)
+                )
+
+                # Obtener la posición y el tamaño del elemento
+                location = element.location
+                size = element.size
+
+                # Calcular las coordenadas del borde inferior del elemento
+                bottom = location['y'] + size['height']
+
+                # Verificar si el borde inferior está dentro de la ventana visible
+                return 0 <= bottom <= driver.execute_script("return window.innerHeight;")
+            except Exception as e:
+                print(f'Error: {e}')
                 return False
 
         # Realizar el desplazamiento en pequeños pasos
         while True:
+            # Recorrer la barra de desplamzamiento del 1% del tamaño de la barra de desplazamiento inicial
             driver.execute_script(f"window.scrollBy(0, {total_scroll_height * scroll_fraction})")
-            time.sleep(1)  # Esperar un segundo entre cada paso
-            tamaño_scroll = driver.execute_script("return document.body.scrollHeight")
-            # Comprobar si el footer es visible para terminar el ciclo
-            if is_element_visible(footer_element):
+            # time.sleep(1)  # Esperar un segundo entre cada paso
+            # tamaño_scroll = driver.execute_script("return document.body.scrollHeight")
+            
+            # Comprobar si el footer está completamente dentro de la vista para terminar el ciclo
+            if is_element_fully_visible(footer_element):
                 break
-
+        
         # Obtener items de cada calzado
         xpath = "//div[@class='product-tile__main product-tile__main--general ratio-container--standard']/a[text()]"
         link_elements = driver.find_elements(By.XPATH,xpath)
