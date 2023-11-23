@@ -4,7 +4,6 @@ from selenium import webdriver
 # from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains 
 from selenium.common.exceptions import ElementClickInterceptedException,NoSuchElementException
 import time
 from Nike_Air_Project.items import ZapatillaItem
@@ -30,8 +29,7 @@ class ZapatillasSpider(scrapy.Spider):
         driver.maximize_window()
         driver.get(self.link_raiz)
         links_aux = []
-        # Inicializar chain object para acciones de selenium 
-        action = ActionChains(driver)
+
         # Recorrer paginas para tener todos los items
         while True:
             # Esperar 5 segundos
@@ -55,12 +53,7 @@ class ZapatillasSpider(scrapy.Spider):
                 # Validar si el elemento existe
                 try:
                     element = driver.find_element(By.XPATH,xpath_nextPage)
-                    # Espera a que el elemento sea visible
-                    # WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, xpath_nextPage)))
-                    # Scrolear al elemento 
-                    # action.move_to_element(element).click().perform()
-                    # element.send_keys(Keys.PAGE_DOWN)  # O también puedes usar Keys.DOWN
-                    # action.move_to_element(element).perform()
+
                     # Esperar 5 segundos
                     time.sleep(2)
                     element.click()

@@ -9,15 +9,15 @@ from selenium.webdriver.common.keys import Keys
 import time
 from Nike_Air_Project.items import ZapatillaItem
 import re
-# import os
+import json
 
 class ZapatillasSpider(scrapy.Spider):
-    name = "Zapatillas_Converse"
-    link_raiz = 'https://www.converse.com/shop/shoes' 
+    name = "Zapatillas_Puma"
+    link_raiz = 'https://us.puma.com/us/en/puma/shop-all-shoes' 
     custom_settings = {
         'ROBOTSTXT_OBEY': False,
         }
-    # start_urls = ["https://x"]
+    # start_urls = ["https://us.puma.com/us/en/pd/mayze-heritage-velvet-womens-sneakers/397113?swatch=01&referrer-category=puma-shop-all-shoes"]
     def start_requests(self):
         chrome_options = webdriver.ChromeOptions()
         prefs = {
@@ -32,27 +32,22 @@ class ZapatillasSpider(scrapy.Spider):
         driver.get(self.link_raiz)
 
         ###### ELEMENTOS ########
-        ###### ELEMENTOS ########
-        # Elemento del footer
-        footer_xpath = "//div[@class='row grid-no-gutters plp__seo-popular-search']/div"  
         # Elemento de links de productos
-        xpath = "//div[@class='product-tile__main product-tile__main--general ratio-container--standard']/a[text()]"
-        # Elemento de la descripcion del producto para validar si es calzado uy no otros "shoes"
-        xpath_desc = "//div[@class='product-tile__details  text-align--left']/p[text()]"
-        # Elemento de cantidad de productos
-        xpath_cantiProd = "//div[@class='plp-actions__count']"
+        xpath = "//li[@data-test-id]/a[text()]"
 
-        try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "//button[@class='window-modal__close']"))
-            ).click()
-        except Exception as e:
-            print(f"No se encontró el banner o hubo un error: {e}")
+        # Elemento de cantidad de productos
+        xpath_cantiProd = "//span[@class='uppercase font-bold text-lg md:text-xl']/span/text()"
+
+        # try:
+        #     WebDriverWait(driver, 10).until(
+        #         EC.presence_of_element_located((By.XPATH, "//button[@class='window-modal__close']"))
+        #     ).click()
+        # except Exception as e:
+        #     print(f"No se encontró el banner o hubo un error: {e}")
 
         total_scroll_height = driver.execute_script("return document.body.scrollHeight")
         scroll_fraction = 0.2
 
-        footer_element = driver.find_element(By.XPATH, footer_xpath)
         cantiProductos = int(self.extraer_numero(driver.find_element(By.XPATH, xpath_cantiProd).text))
         print(cantiProductos)
         print(int(cantiProductos * 0.8))
@@ -69,10 +64,9 @@ class ZapatillasSpider(scrapy.Spider):
 
             # Obtener items de cada calzado
             link_elements = driver.find_elements(By.XPATH, xpath)
-            desc_element = driver.find_elements(By.XPATH, xpath_desc)
 
             # Ciclo para recorrer los elementos extraídos para cada producto de la página
-            for link_el, desc_el in zip(link_elements, desc_element):
+            for link_el in link_elements:
                 cont_produc_extr += 1
                 print(f'Número de productos: {cont_produc_extr}')
 
@@ -82,42 +76,49 @@ class ZapatillasSpider(scrapy.Spider):
 
                 href = link_el.get_attribute("href")
                 # Validar si en la descripción contiene "SHOE"
-                if self.buscar_palabra(desc_el.text, "SHOE"):
-                    # Solicitud de Links extraídos
-                    yield scrapy.Request(href)
+                yield scrapy.Request(href)
 
             # Comprobar si se ha alcanzado el límite de productos
             if cont_produc_extr > int(cantiProductos * 0.8):
                 break
 
         driver.quit()
+
     def parse(self, response):
-        self.log(f'Ejecutando parse para URL: {response.url}')
-        try:
-            item = ZapatillaItem()
-            item['modelo'] = response.xpath("//h1[@class='pdp-primary-information__product-name display--small-up']/text()").get().strip()
-            item['marca']  = "Converse"
-            item['precio'] = response.xpath("//div[@class='pdp-primary-information__price body-type display--small-up']//span/text()").get().strip()
-            item['color']  = response.xpath("//div[@class='pdp-variations__variation-information text-line--xlarge']//span/text()").get().strip()
-            item['descripcion'] = response.xpath("//p[@class='pdp-primary-information__short-description']/text()").get().strip()
-            item['url_raiz'] = self.link_raiz
-            item['url_calzado'] = response.url
-            # item['imagenes']= self.limpiar_data(response.xpath("//div[@class='pdp-images-gallery__gallery-item-container pdp-images-gallery__gallery-item-container--supplementry']//img/@src").getall())
-            item['tallas']= self.limpiar_lista_data(response.xpath("//*[@id='variationDropdown-size']/option/text()").getall())
-            item['imagenes']= response.xpath("//div[@class='pdp-images-gallery__gallery-item-container pdp-images-gallery__gallery-item-container--supplementry']//img/@data-src").getall()
-            # item['imagenes']= response.css("div.pdp-images-gallery__gallery-item-container.pdp-images-gallery__gallery-item-container--supplementry img[src]").getall()
-            # item['tallas']= response.xpath("//*[@id='variationDropdown-size']/option/text()").getall()
-            yield item
-        except Exception as e:
-            self.log(f"Error en parse: {e}")
+
+        item = ZapatillaItem()
+        item['modelo'] = response.xpath("//div[@class='tw-1uc1ku0 tw-1p4ksvz']/h1/text()").get().strip()
+        item['marca']  = "Converse"
+        item['precio'] = response.xpath("//div[@class='tw-qlq5hv tw-1p4ksvz']/span/text()").get().strip()
+        item['color']  = response.xpath("//div[@class='tw-xf6gca tw-1p4ksvz']/h4/text()" ).get().strip()
+        item['url_raiz'] = self.link_raiz
+        item['url_calzado'] = response.url
+        item['imagenes']= response.xpath("//section[@class='order-1 relative md:col-span-4 lg:col-span-8']//div/img/@src").getall()
+        # Elemento que contiene el json para obtener caracteristicas
+        json_element = response.xpath("//script[@id='__NEXT_DATA__']/text()").get()
+
+        # Formatear json
+        data_json = json.loads(json_element)
+        json_aux=self.find_jsonLabel(obj=data_json,etiqueta='data')
+        print(f'1er json: {len(json_aux)} datos')
+        print(json_aux)
+        data_json=json.loads(json_aux[4])
+        tallas=self.find_jsonLabel(obj=data_json,etiqueta='label')
+
+        item['tallas'] =  [x for x in tallas if x is not None]
+
+        data_json=json.loads(json_aux[9])
+        desc=self.find_jsonLabel(obj=data_json,etiqueta='description')
+        item['descripcion'] = str(desc[0])
+        yield item
+
     
     def limpiar_lista_data(self, lista_datos):
         resultado = []
         for data in lista_datos:
             # print('CALZADO DEPORTIVO: '+data)
             val = data.strip()
-            if 'Pick' not in val:
-                resultado.append(val)
+            resultado.append(val)
         return resultado
 
     def buscar_palabra(self, cadena, palabra):
@@ -140,6 +141,7 @@ class ZapatillasSpider(scrapy.Spider):
         else:
             return None
             # Función para verificar si el elemento está completamente dentro de la vista
+
     def is_element_fully_visible(self, element, driver):
         try:
             # Esperar hasta que el elemento sea visible
@@ -159,6 +161,22 @@ class ZapatillasSpider(scrapy.Spider):
         except Exception as e:
             print(f'Error: {e}')
             return False
+        
+    def find_jsonLabel(self, obj, etiqueta):
+            resultado = []
+            def buscar_recursivamente(obj):
+                if isinstance(obj, dict):
+                    for key, value in obj.items():
+                        if key == etiqueta:
+                            resultado.append(value)
+                        elif isinstance(value, (dict, list)):
+                            buscar_recursivamente(value)
+                elif isinstance(obj, list):
+                    for item in obj:
+                        buscar_recursivamente(item)
+
+            buscar_recursivamente(obj)
+            return resultado
 ## Comando para extraer 
-### scrapy crawl Zapatillas_Converse -o Converse.json -t json
-#   scrapy crawl Zapatillas_Converse -o Converse.csv -t csv
+### scrapy crawl Zapatillas_Puma -o Puma.json -t json
+#   scrapy crawl Zapatillas_Puma -o Puma.csv -t csv
