@@ -8,13 +8,14 @@ from selenium.common.exceptions import ElementClickInterceptedException,StaleEle
 import time
 from Nike_Air_Project.items import ZapatillaItem
 import json
+from ..spiders.metodos import Metodos as truco
 
 class ZapatillasSpider(scrapy.Spider):
     cont_links = 0
     name = "Under_Armour"
     link_raiz = 'https://www.underarmour.com/en-us/c/shoes/' 
     # allowed_domains = ["x"]
-    # start_urls = ["https://www.underarmour.com/en-us/p/running_and_training/grade_school_project_rock_bsr_3_training_shoes/3026767.html?dwvar_3026767_color=001"]
+    # start_urls = ["https://www.underarmour.com/en-us/p/running/womens_ua_hovr_mega_warm_running_shoes/3026820.html?dwvar_3026820_color=100"]
     def start_requests(self):
         chrome_options = webdriver.ChromeOptions()
         prefs ={    "profile.default_content_setting_values.notifications":2,
@@ -83,8 +84,8 @@ class ZapatillasSpider(scrapy.Spider):
     def parse(self, response):
         item = ZapatillaItem()
         item['modelo'] = response.xpath("//h1[@class='ProductDetailContent_productNameWording__PNuV_']/text()").get()
-        item['marca']  = 'Reebok'
-        item['precio'] = response.xpath("//div[@id='product-price']/div/span/text()").get()
+        item['marca']  = 'Under Armour'
+        item['precio'] = truco.obtener_valor_mayor_de_string(response.xpath("//div[@id='product-price']/div/span/text()").get())
         item['color']  = response.xpath("//fieldset[@name='color-swatches']/legend/span[2]/text()").get()
         item['descripcion'] = response.xpath("//nav[@class='Breadcrumbs_breadcrumbs__ADNo9 ProductDetailContent_breadcrumbs__Zjc_n']//li/a/text()").getall()
         item['url_raiz'] = self.link_raiz

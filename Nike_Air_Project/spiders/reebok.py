@@ -73,7 +73,7 @@ class ZapatillasSpider(scrapy.Spider):
         item = ZapatillaItem()
         item['modelo'] = response.xpath("//div[@class='col--TywhC   col-breakpoints--2NB5_ col-lg-4--1ct9j']//h1/text()").getall()
         item['marca']  = 'Reebok'
-        item['precio'] = response.xpath("//div[@class='flex-row--1XndU column-gap-5--vYgBs  text-align-left--3KlWV']//p/text()").getall()
+        item['precio'] = response.xpath("//div[@class='flex-row--1XndU column-gap-5--vYgBs  text-align-left--3KlWV']//p[1]/text()[2]").getall()
         item['color']  = response.xpath("//div[@class='flex-row--1XndU text-align-left--3KlWV']/p[@class='tag_p--1xo5V']/text()").getall()
         item['descripcion'] = response.xpath("//h2[@class='tag_h1_w_bold--3Xher  product-detail-case--uvj_l']/text()").getall()
         item['url_raiz'] = self.link_raiz
