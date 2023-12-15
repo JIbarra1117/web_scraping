@@ -66,9 +66,14 @@ DOWNLOAD_DELAY = 3
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "Nike_Air_Project.pipelines.NikeAirProjectPipeline": 300,
-#}
+ITEM_PIPELINES = [
+    'Nike_Air_Project.pipelines.MongoDBPipeline',
+]
+
+MONGODB_SERVER = "127.0.0.1"
+MONGODB_PORT = 27017
+MONGODB_DB = "extraccion_scrapy"
+MONGODB_COLLECTION = "calzados_deportivos"
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

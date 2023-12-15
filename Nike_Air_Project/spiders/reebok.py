@@ -71,11 +71,11 @@ class ZapatillasSpider(scrapy.Spider):
     def parse(self, response):
         # div_descripcion = '//div[@class="css-mso6zd"]'
         item = ZapatillaItem()
-        item['modelo'] = response.xpath("//div[@class='col--TywhC   col-breakpoints--2NB5_ col-lg-4--1ct9j']//h1/text()").getall()
+        item['modelo'] = response.xpath("//div[@class='col--TywhC   col-breakpoints--2NB5_ col-lg-4--1ct9j']//h1/text()").get()
         item['marca']  = 'Reebok'
-        item['precio'] = response.xpath("//div[@class='flex-row--1XndU column-gap-5--vYgBs  text-align-left--3KlWV']//p[1]/text()[2]").getall()
-        item['color']  = response.xpath("//div[@class='flex-row--1XndU text-align-left--3KlWV']/p[@class='tag_p--1xo5V']/text()").getall()
-        item['descripcion'] = response.xpath("//h2[@class='tag_h1_w_bold--3Xher  product-detail-case--uvj_l']/text()").getall()
+        item['precio'] = response.xpath("//div[@class='flex-row--1XndU column-gap-5--vYgBs  text-align-left--3KlWV']//p[1]/text()[2]").get()
+        item['color']  = response.xpath("//div[@class='flex-row--1XndU text-align-left--3KlWV']/p[@class='tag_p--1xo5V']/text()").get()
+        item['descripcion'] = response.xpath("//h2[@class='tag_h1_w_bold--3Xher  product-detail-case--uvj_l']/text()").get()
         item['url_raiz'] = self.link_raiz
         item['url_calzado'] = response.url
         # Elemento que contiene el json para obtener caracteristicas

@@ -87,7 +87,8 @@ class ZapatillasSpider(scrapy.Spider):
         item['marca']  = 'Under Armour'
         item['precio'] = truco.obtener_valor_mayor_de_string(response.xpath("//div[@id='product-price']/div/span/text()").get())
         item['color']  = response.xpath("//fieldset[@name='color-swatches']/legend/span[2]/text()").get()
-        item['descripcion'] = response.xpath("//nav[@class='Breadcrumbs_breadcrumbs__ADNo9 ProductDetailContent_breadcrumbs__Zjc_n']//li/a/text()").getall()
+        descs = response.xpath("//nav[@class='Breadcrumbs_breadcrumbs__ADNo9 ProductDetailContent_breadcrumbs__Zjc_n']//li/a/text()").getall()
+        item['descripcion'] = " / ".join(descs)
         item['url_raiz'] = self.link_raiz
         item['url_calzado'] = response.url
         item['imagenes'] = response.xpath("//div[@class='MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6 ProductDetailContent_desktop-only__Qpk8D css-1s50f5r']//img/@src").getall()

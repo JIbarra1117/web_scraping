@@ -15,47 +15,47 @@ class ZapatillasSpider(scrapy.Spider):
     link_raiz = 'https://www.nike.com/us/es/w/calzado-y7ok' #https://www.nike.com/us/es/w/negro-air-max-calzado-90poyza6d8hzy7ok
     # link_raiz = "https://www.nike.com/us/es/w/negro-air-max-calzado-90poyza6d8hzy7ok"
     # allowed_domains = ["x"]
-    # start_urls = ["https://www.nike.com/us/es/t/calzado-talla-grande-free-run-2-bLrw0d/DD0163-101"]
-    def start_requests(self):
-        chrome_options = webdriver.ChromeOptions()
-        prefs ={"profile.default_content_setting_values.notifications":2}
-        chrome_options.add_experimental_option("prefs",prefs )
-        # Opciones de navegación
-        driver = webdriver.Chrome(chrome_options)
-        driver.maximize_window()
-        driver.get(self.link_raiz)
+    start_urls = ["https://www.nike.com/us/es/t/calzado-talla-grande-free-run-2-bLrw0d/DD0163-101"]
+#     def start_requests(self):
+#         chrome_options = webdriver.ChromeOptions()
+#         prefs ={"profile.default_content_setting_values.notifications":2}
+#         chrome_options.add_experimental_option("prefs",prefs )
+#         # Opciones de navegación
+#         driver = webdriver.Chrome(chrome_options)
+#         driver.maximize_window()
+#         driver.get(self.link_raiz)
 
-        # Realiza una acción que cierra la ventana emergente, como hacer clic en un enlace
-        button = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.CSS_SELECTOR,"button[aria-label='Close Menu']"))).click()
+#         # Realiza una acción que cierra la ventana emergente, como hacer clic en un enlace
+#         button = WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.CSS_SELECTOR,"button[aria-label='Close Menu']"))).click()
         
-        last_height = driver.execute_script("return document.body.scrollHeight")
-        time.sleep(5)
-        # Realiza el scroll hasta que no se pueda hacer más
-        while True:
-            # Realiza un scroll hacia abajo
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-#s
-            # Espera un momento para que cargue el contenido (ajusta el tiempo según tu página)
-            driver.implicitly_wait(10)
-            time.sleep(5)
-            # Obtiene la nueva altura de la página
-            new_height = driver.execute_script("return document.body.scrollHeight")
+#         last_height = driver.execute_script("return document.body.scrollHeight")
+#         time.sleep(5)
+#         # Realiza el scroll hasta que no se pueda hacer más
+#         while True:
+#             # Realiza un scroll hacia abajo
+#             driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+# #s
+#             # Espera un momento para que cargue el contenido (ajusta el tiempo según tu página)
+#             driver.implicitly_wait(10)
+#             time.sleep(5)
+#             # Obtiene la nueva altura de la página
+#             new_height = driver.execute_script("return document.body.scrollHeight")
 
-            # Compara la altura anterior con la nueva altura
-            if new_height == last_height:
-                break  # Si no hubo cambio en la altura, termina el scroll
-            last_height = new_height
-        # Esperar 5 segundos
-        time.sleep(5)
-        # Obtener items de cada calzado
-        xpath = '//div[@class="product-card__body"]//a[text()]' 
-        link_elements = driver.find_elements(By.XPATH,xpath)
+#             # Compara la altura anterior con la nueva altura
+#             if new_height == last_height:
+#                 break  # Si no hubo cambio en la altura, termina el scroll
+#             last_height = new_height
+#         # Esperar 5 segundos
+#         time.sleep(5)
+#         # Obtener items de cada calzado
+#         xpath = '//div[@class="product-card__body"]//a[text()]' 
+#         link_elements = driver.find_elements(By.XPATH,xpath)
 
-        for link_el in link_elements:
-            href = link_el.get_attribute("href")
-            yield scrapy.Request(href)
+#         for link_el in link_elements:
+#             href = link_el.get_attribute("href")
+#             yield scrapy.Request(href)
         
-        driver.quit()
+#         driver.quit()
 
     def parse(self, response):
         # Obtener el HTML de la respuesta
